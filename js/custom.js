@@ -112,38 +112,7 @@
     /* ==============================================
      CONTACT -->
      =============================================== */
-    jQuery(document).ready(function() {
-        $('#contactform').submit(function() {
-            var action = $(this).attr('action');
-            $("#message").slideUp(750, function() {
-                $('#message').hide();
-                $('#submit')
-                    .after('<img src="images/ajax-loader.gif" class="loader" />')
-                    .attr('disabled', 'disabled');
-                $.post(action, {
-                        first_name: $('#first_name').val(),
-                        last_name: $('#last_name').val(),
-                        email: $('#email').val(),
-                        phone: $('#phone').val(),
-                        select_service: $('#select_service').val(),
-                        select_price: $('#select_price').val(),
-                        comments: $('#comments').val(),
-                        verify: $('#verify').val()
-                    },
-                    function(data) {
-                        document.getElementById('message').innerHTML = data;
-                        $('#message').slideDown('slow');
-                        $('#contactform img.loader').fadeOut('slow', function() {
-                            $(this).remove()
-                        });
-                        $('#submit').removeAttr('disabled');
-                        if (data.match('success') != null) $('#contactform').slideUp('slow');
-                    }
-                );
-            });
-            return false;
-        });
-    });
+
 
     /* ==============================================
      CODE WRAPPER -->
@@ -191,10 +160,19 @@
 })(jQuery);
 
 jQuery(document).ready(function($){
+
 	var cartWrapper = $('.cd-cart-container');
 	//product id - you don't need a counter in your real project but you can use your real product id
 	var productId = 0;
-
+	let cartListArray = {}
+	let productData = {
+		"Saloon": {
+			objectId : 1,
+			name: "Saloon",
+			price: 400,
+			imgSrc: "./uploads/barber_service_01.jpg"
+		}
+	}
 	if( cartWrapper.length > 0 ) {
 		//store jQuery objects
 		var cartBody = cartWrapper.find('.body')
@@ -203,19 +181,26 @@ jQuery(document).ready(function($){
 		var cartTrigger = cartWrapper.children('.cd-cart-trigger');
 		var cartCount = cartTrigger.children('.count')
 		var addToCartBtn = $('.cd-add-to-cart');
+		var checkoutBtn = $('.checkout')
 		var undo = cartWrapper.find('.undo');
 		var undoTimeoutId;
 
 		//add product to cart
 		addToCartBtn.on('click', function(event){
 			event.preventDefault();
-			addToCart($(this));
+			addToCart($(this), event.target.className.split("cd-add-to-cart")[1].trim());
 		});
 
 		//open/close cart
 		cartTrigger.on('click', function(event){
 			event.preventDefault();
 			toggleCart();
+		});
+
+		checkoutBtn.on('click', function(event){
+			window.localStorage.setItem("cartList", JSON.stringify(cartListArray))
+			window.localStorage.setItem("productList", JSON.stringify(productData))
+			window.location = "appointment.html"
 		});
 
 		//close cart when clicking on the .cd-cart-container::before (bg layer)
@@ -266,10 +251,10 @@ jQuery(document).ready(function($){
 		}
 	}
 
-	function addToCart(trigger) {
+	function addToCart(trigger, product) {
 		var cartIsEmpty = cartWrapper.hasClass('empty');
 		//update cart product list
-		addProduct();
+		addProduct(product);
 		//update number of items 
 		updateCartCount(cartIsEmpty);
 		//update total price
@@ -278,12 +263,14 @@ jQuery(document).ready(function($){
 		cartWrapper.removeClass('empty');
 	}
 
-	function addProduct() {
+	function addProduct(product) {
 		//this is just a product placeholder
 		//you should insert an item with the selected product info
 		//replace productId, productName, price and url with your real product info
-		productId = productId + 1;
-		var productAdded = $('<li class="product"><div class="product-image"><a href="#0"><img src="img/product-preview.png" alt="placeholder"></a></div><div class="product-details"><h3><a href="#0">Product Name</a></h3><span class="price">$25.99</span><div class="actions"><a href="#0" class="delete-item">Delete</a><div class="quantity"><label for="cd-product-'+ productId +'">Qty</label><span class="select"><select id="cd-product-'+ productId +'" name="quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></span></div></div></div></li>');
+		//asasas
+		let productDetails = productData[product]
+		var productAdded = $('<li class="product"><div class="product-details"><h3><a href="#0">'+ productDetails["name"] +'</a></h3><span class="price">'+ productDetails["price"] +'</span></div></li>');
+		cartListArray[productDetails["name"]] =  productData[productDetails["name"]]
 		cartList.prepend(productAdded);
 	}
 

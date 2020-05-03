@@ -2885,9 +2885,7 @@ body.barber_version .dev-list .widget:hover .hover-br .social-up-hover .footer-s
   .cd-cart .product-details {
     position: relative;
     display: inline-block;
-    float: right;
     width: calc( 100% - 50px);
-    padding: 0.3em 0 0 0.5em;
   }
   .cd-cart .product-details::after {
     clear: both;
@@ -3241,7 +3239,9 @@ body.barber_version .dev-list .widget:hover .hover-br .social-up-hover .footer-s
 }
 
 
-
+input[type="date"]::-webkit-inner-spin-button{
+    display: none;
+}
 
 
 
